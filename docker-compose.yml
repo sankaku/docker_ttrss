@@ -1,0 +1,59 @@
+version: '2'
+services:
+  db:
+    build: ./db
+    image: ttrss-db
+    container_name: ttrss-db-container
+    volumes:
+      - "./db/db:/var/lib/mysql"
+      - "./db/log:/var/log/mysql"
+      - ./db/target/charset.cnf:/etc/mysql/conf.d/charset.cnf
+    environment:
+      MYSQL_ROOT_PASSWORD: "password123"
+    ports:
+      - "3306:3306"
+
+  web:
+    build: ./web
+    image: ttrss-web
+    container_name: ttrss-web-container
+    environment:
+      TZ: "Asia/Tokyo"
+    volumes:
+      - "./web/log:/var/log/nginx"
+      - app-dir:/var/www/app-dir
+      - sock-app:/var/run/php-fpm-app
+      - sock-subapp:/var/run/php-fpm-subapp
+    ports:
+      - "80:80"
+      - "18888:18888"
+    links:
+      - app
+      - subapp
+
+  app:
+    build: ./app
+    image: ttrss-app
+    container_name: ttrss-app-container
+    environment:
+      TZ: "Asia/Tokyo"
+    volumes:
+      - sock-app:/var/run/php-fpm
+      - app-dir:/var/www/ttrss
+    links:
+      - db
+      - subapp
+
+  subapp:
+    build: ./subapp
+    image: ttrss-subapp
+    container_name: ttrss-subapp-container
+    environment:
+      TZ: "Asia/Tokyo"
+    volumes:
+      - sock-subapp:/var/run/php-fpm
+
+volumes:
+  app-dir:
+  sock-app:
+  sock-subapp:
