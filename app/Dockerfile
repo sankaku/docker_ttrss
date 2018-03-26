@@ -1,21 +1,20 @@
-FROM php:7.2.0-fpm-alpine3.6
-
-# RUN apk update \
-#     && apk add git shadow \
-#     && git clone --progress --verbose https://tt-rss.org/git/tt-rss.git /var/www/ttrss
+FROM php:7.2-fpm-alpine3.6
 
 RUN apk update \
-    && apk add shadow \
-    && mkdir -p /var/www
-COPY ./target/tt-rss /var/www/ttrss
+    && apk add git shadow \
+    && git clone --progress --verbose https://tt-rss.org/git/tt-rss.git /var/www/ttrss
+
+# RUN apk update \
+#     && apk add wget shadow \
+#     && wget https://git.tt-rss.org/fox/tt-rss/archive/17.4.tar.gz -P /tmp \
+#     && tar zxfv /tmp/17.4.tar.gz -C /var/www \
+#     && mv /var/www/tt-rss /var/www/ttrss
 
 RUN groupadd -g 1000 nginx \
     && useradd -s /sbin/nologin -u 1000 -g nginx nginx \
     && mkdir -p /var/run/php-fpm \
     && chown -R nginx:nginx /var/run/php-fpm \
     && chown -R nginx:nginx /var/www/ttrss
-# RUN useradd -s /sbin/nologin -u 1000 nginx \
-#     && chown -R nginx:nginx /var/www/ttrss
 
 # to execute update.php
 RUN cd /var/www/ttrss \
