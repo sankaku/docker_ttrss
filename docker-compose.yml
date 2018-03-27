@@ -40,6 +40,7 @@ services:
     volumes:
       - sock-app:/var/run/php-fpm
       - app-dir:/var/www/ttrss
+      - "./app/log:/var/log/supervisor"
     links:
       - db
       - subapp

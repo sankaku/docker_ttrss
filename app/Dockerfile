@@ -16,9 +16,11 @@ RUN groupadd -g 1000 nginx \
     && chown -R nginx:nginx /var/run/php-fpm \
     && chown -R nginx:nginx /var/www/ttrss
 
-# to execute update.php
+# to execute update_daemon2.php
 RUN cd /var/www/ttrss \
-    && chmod -R 777 cache/images cache/upload cache/export cache/js feed-icons lock
+    && chmod -R 777 cache/images cache/upload cache/export cache/js feed-icons lock \
+    && docker-php-ext-install pcntl \
+    && ln -s /usr/local/bin/php /usr/bin/php
 
 # PHP extentions
 RUN apk update \
@@ -28,3 +30,12 @@ RUN apk update \
 # php-fpm config
 COPY ./target/www.conf /usr/local/etc/php-fpm.d/zzz-www.conf
 
+# supervisord
+RUN apk update \
+    && apk add supervisor \
+    && mkdir /var/log/supervisor
+COPY target/supervisord.conf /etc/supervisord.conf
+RUN chown nginx:nginx /etc/supervisord.conf \
+    && chmod 400 /etc/supervisord.conf
+
+CMD supervisord -c /etc/supervisord.conf
