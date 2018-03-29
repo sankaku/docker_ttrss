@@ -4,12 +4,6 @@ RUN apk update \
     && apk add git shadow \
     && git clone --progress --verbose https://tt-rss.org/git/tt-rss.git /var/www/ttrss
 
-# RUN apk update \
-#     && apk add wget shadow \
-#     && wget https://git.tt-rss.org/fox/tt-rss/archive/17.4.tar.gz -P /tmp \
-#     && tar zxfv /tmp/17.4.tar.gz -C /var/www \
-#     && mv /var/www/tt-rss /var/www/ttrss
-
 RUN groupadd -g 1000 nginx \
     && useradd -s /sbin/nologin -u 1000 -g nginx nginx \
     && mkdir -p /var/run/php-fpm \
@@ -22,10 +16,15 @@ RUN cd /var/www/ttrss \
     && docker-php-ext-install pcntl \
     && ln -s /usr/local/bin/php /usr/bin/php
 
-# PHP extentions
-RUN apk update \
-    && apk add icu-dev \
-    && docker-php-ext-install intl pdo_mysql mysqli
+# PHP extentions(following PhpCompatibilityNotes and Tiny Tiny RSS Installer)
+# `intl` and `mysqli` are recommended by Tiny Tiny RSS Installer and `icu-dev` is for `intl` dependency
+RUN apk --update add icu-dev \
+    && docker-php-ext-install intl pdo_mysql mysqli \
+    && docker-php-ext-enable opcache
+# gd
+RUN apk --update add libpng-dev libjpeg-turbo-dev freetype-dev \
+    && docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
+    && docker-php-ext-install gd
 
 # php-fpm config
 COPY ./target/www.conf /usr/local/etc/php-fpm.d/zzz-www.conf
