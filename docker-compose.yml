@@ -7,7 +7,6 @@ services:
     volumes:
       - "./db/db:/var/lib/mysql"
       - "./db/log:/var/log/mysql"
-      - ./db/target/charset.cnf:/etc/mysql/conf.d/charset.cnf
     environment:
       MYSQL_ROOT_PASSWORD: "password123"
     ports:
