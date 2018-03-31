@@ -1,4 +1,4 @@
-version: '2'
+version: '3'
 services:
   db:
     build: ./db
@@ -27,7 +27,7 @@ services:
     ports:
       - "80:80"
       - "18888:18888"
-    links:
+    depends_on:
       - app
       - subapp
 
@@ -41,7 +41,7 @@ services:
       - sock-app:/var/run/php-fpm
       - app-dir:/var/www/ttrss
       - "./app/log:/var/log/supervisor"
-    links:
+    depends_on:
       - db
       - subapp
 
