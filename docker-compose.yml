@@ -7,6 +7,7 @@ services:
     volumes:
       - "./db/db:/var/lib/mysql"
       - "./db/log:/var/log/mysql"
+      - "./db/target/charset.cnf:/etc/mysql/conf.d/charset.cnf"
     environment:
       MYSQL_ROOT_PASSWORD: "password123"
     ports:
@@ -20,6 +21,8 @@ services:
       TZ: "Asia/Tokyo"
     volumes:
       - "./web/log:/var/log/nginx"
+      - "./web/target/fivefilters.conf:/etc/nginx/conf.d/fivefilters.conf"
+      - "./web/target/ttrss.conf:/etc/nginx/conf.d/ttrss.conf"
       - app-dir:/var/www/app-dir
       - subapp-dir:/var/www/subapp-dir
       - sock-app:/var/run/php-fpm-app
